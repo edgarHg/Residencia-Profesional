@@ -1,0 +1,136 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"servicios_reparaciones",
+					sentencia:"select * from vw_servicios_aceptados",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"servicio_reparacion\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"80"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"180"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"150"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Revisión del Taller", valor:"#revision_taller#",ancho:"140"})				
+						
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});	
+				 f.combo({
+					elemento:"reparado_por",
+					sentencia:"select * from vw_usuarios where departamento=4",
+					valor:"id_usuario",
+					descripcion:"nombre_completo"
+				});
+				u.elemento("dServicio_aceptados").hide();
+				u.elemento("servicio_reparacion").click(function(){
+					var ocultar=document.getElementById("dservicio_repa");
+					var icono=document.getElementById("oc_img");
+					ocultar.style.display = "none";
+			  		icono.src ="img/mostrar.png";
+			  		icono.title ="Mostrar";
+					var servicio=$(this).attr("id");
+					document.getElementById("dServicioA").style.display='block';
+					document.getElementById("dguardar").style.display='block';
+					f.consulta({
+					sentencia:"SELECT * FROM  vw_servicios_aceptados WHERE id_servicio=?",
+					parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+					],accion:function(datos){
+							f.tabla({
+									elemento:"dServicio_aceptados",
+									id:"id_servicio",
+									sentencia:"SELECT * FROM vw_servicios_aceptados WHERE id_servicio=?",
+									parametros:[
+										new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+									],
+									columnas:[
+										new f.columna({titulo:"<div style='font-size: 10pt'>Servicio N°: "+datos.filas[0].id_servicio+"<br/> Fecha Creado: "+datos.filas[0].fecha_creacion_servicio+" <br/>Creado por: "+datos.filas[0].usuario+"</div>", valor:"<input type=\"hidden\" name=\"id_servicio\" value=\"#id_servicio#\"/>", ancho:"850"}),	
+									]
+							});
+					}
+					});
+					u.elemento("dServicio_aceptados").show();
+				});	
+				u.elemento("new_reparacion").submit(function(){
+					f.validar({
+						elementos:[
+							new f.elemento({nombre:"des_reparacion", tipo:"texto", requerido:true}),
+							new f.elemento({nombre:"ob_equipo", tipo:"texto", requerido:true}),
+							new f.elemento({nombre:"reparado_por", tipo:"combo", requerido:true}),							
+						],accion:function(){
+							f.consulta({
+								sentencia:"INSERT INTO reparaciones(id_servicio,id_usuario,descripcion,observaciones,reparado_por) values(?,?,?,?,?)",
+								parametros:[
+									new f.parametro({tipo:t.cadena, valor:"id_servicio", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"id", referencia:r.sesion}),
+									new f.parametro({tipo:t.cadena, valor:"des_reparacion", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"ob_equipo", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"reparado_por", referencia:r.elemento})
+								],accion:function(){
+										var estatu=52;
+										f.consulta({
+											sentencia:"UPDATE servicios SET id_estatus_servicio=? WHERE id_servicio=?",
+											parametros:[
+												new f.parametro({tipo:t.entero, valor:estatu, referencia:r.variable}),		
+												new f.parametro({tipo:t.cadena, valor:"id_servicio",referencia:r.elemento})
+											]
+										});
+													
+												alert("Reparación Guardada con exito");
+												u.mostrar("work_oper", "link/taller/servicios_reparacion.html");			
+									}		
+							});
+						}
+					});
+				});
+	});
+	function mostrar_ocultar() {
+		var ocultar=document.getElementById("dservicio_repa");
+		var icono=document.getElementById("oc_img");
+		
+					
+	  if(ocultar.style.display=="block" || ocultar.style.display==""){
+	  		ocultar.style.display = "none";
+	  		icono.src ="img/mostrar.png";
+	  		icono.title ="Mostrar";
+	  }
+	  else{
+	  		ocultar.style.display = "block";
+	  		icono.src ="img/ocultar.png";
+	  		icono.title ="Ocultar";
+	  }
+	}
+</script>
+<div class="recuadroT">
+	<label class="title">SERVICIOS EN REPARACIÓN <a class="accCuadro" id="mos_ocl" onclick="mostrar_ocultar()"> <img src="img/ocultar.png" id="oc_img" title="Ocultar"/></a></label>
+	<div name="detalle_servicios">
+		<div class="detalles">
+		<div name="servicios_reparaciones" id="dservicio_repa" class="tabla_consultas" style="display: block;"> </div>
+		<form method="post" name="new_reparacion" onSubmit="return false" autocomplete="off">
+			<div name="dServicio_aceptados" id="dServicioA" style="display: none;">
+				
+			</div>
+			<div class="formulario" id="dguardar" style="display: none;">
+							<div  class="filas" style="color:#fff; font-family:font_4; font-size:16px;">
+								&#160&#160Descripción de la Reparación:	<br/>
+								&#160&#160<textarea class="text_area" name="des_reparacion" style="height: 70px;"></textarea>
+							</div>
+							<div  class="filas" style="color:#fff; font-family:font_4; font-size:16px;">
+								&#160&#160Observación del equipo:<br/>
+								&#160&#160<textarea class="text_area" name="ob_equipo" style="height: 70px;"></textarea>
+							</div>
+							<div  class="filas" style="color:#fff; font-family:font_4; font-size:16px;">
+								&#160&#160Reparado por:<br/>
+								<select name="reparado_por" class="select" style="margin-left: 10px;"><option value="0">-- Seleccione --</option></select>
+							</div>
+							<br />
+						<div class="recuadro_boton" align="center" style="width:837px; margin-left:0px; ">
+								<input type="submit" class="boton" value="guardar" style="position:static;"/>
+						</div>
+						</div>
+		</form>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,13 @@
+@charset "utf-8";
+/* Copyright(c) 2013, eHg */
+a{
+	cursor:pointer;
+}
+img.ui-datepicker-trigger{
+	height:20px;
+	position:relative;
+	top:4px;
+}
+div.ui-datepicker{
+	font-size:60%;
+}

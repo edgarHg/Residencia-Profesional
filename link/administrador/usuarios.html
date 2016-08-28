@@ -1,0 +1,24 @@
+<script>
+		$(document).ready(function(){
+				f.tabla({
+					elemento:"usuarios",
+					sentencia:"select * from vw_usuarios",
+					columnas:[
+						new f.columna({titulo:"Usuario", valor:"<a onclick=\"alert(#id_usuario#);\">#usuario#</a>",ancho:"90"}),
+						new f.columna({titulo:"Contraseña", valor:"#contrasena#",ancho:"100"}),
+						new f.columna({titulo:"Nombre", valor:"#nombre_completo#",ancho:"200"}),
+						new f.columna({titulo:"Puesto", valor:"#tipo_usuario#",ancho:"250"}),
+						new f.columna({titulo:"Estatus", valor:"#estatus#",ancho:"60"}),
+						new f.columna({titulo:"Acción", valor:"<a>Mas Info</a>",ancho:"100"}),
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					contador:true,
+					paginador:true
+				});	
+			});
+</script>
+<div class="recuadroT">
+	<label class="title">NUESTROS USUARIOS</label>
+	<div name="usuarios" class="tabla_consultas"> </div>
+</div>

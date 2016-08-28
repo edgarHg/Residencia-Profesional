@@ -1,0 +1,41 @@
+@charset "utf-8";
+/* Copyright(c) 2013, eHg */
+
+div.lista_archivos_subir div.archivo_subir{
+	background-color:#CCC;
+	margin-top:15px;
+	padding:10px 0px 10px 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: 0px 0px 10px 0px #666;
+	box-shadow: 0px 0px 10px 0px #666;
+}
+div.lista_archivos_subir div.archivo_subir span{
+	float:left;
+}
+div.lista_archivos_subir div.archivo_subir div.clear{
+	clear:both;
+}
+div.lista_archivos_subir div.archivo_subir span.nombre_archivo_subir{
+	margin-left:5px;
+	font-weight:bold;
+}
+div.lista_archivos_subir div.archivo_subir span.tamano_archivo_subir{
+	margin-left:5px;
+}
+div.lista_archivos_subir div.archivo_subir span.estado_subir{
+	margin-left:5px;
+	font-style: italic
+}
+div.lista_archivos_subir img.cancelar_subir{
+	margin-right:10px;
+	cursor:pointer;
+	float:right;
+	position:relative; 
+	top:2px;
+}
+div.lista_archivos_subir img.miniatura_subir{
+	height:64px;
+	float:left;
+}

@@ -1,0 +1,57 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"fichas_tecnicas",
+					sentencia:"select * from fichas_tecnicas order by id_ficha_tecnica desc",
+					columnas:[
+						new f.columna({titulo:"Titulo", valor:"#titulo# <br/>Precio: $#precio# <br/><br/>"+
+																"<a onclick=\"eliminar(#id_ficha_tecnica#)\"><img width=\"24\" src=\"img/eliminar.png\" title=\"Eliminar\"/></a>"+
+																"<a onclick=\"pdfFTecnica(#id_ficha_tecnica#)\"><img width=\"24\" src=\"img/fTecnica.png\" title=\"PDF Tecnica\"/></a>",ancho:"150"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"90"}),
+						new f.columna({titulo:"Modelo", valor:"#modelo#",ancho:"80"}),
+						new f.columna({titulo:"Modelo", valor:"#descripcion#",ancho:"480"}),
+						new f.columna({titulo:"Imagen", valor:"<img width=\"100px\" src=\"#ruta#\"/>",ancho:"60"})						
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+					u.elemento("detalle_servicio").hide();
+			u.elemento("detalles_servicio").click(function(){
+				var servicio=$(this).attr("id");
+				
+			});
+	});
+		function pdfFTecnica(id_fTecnica) {	
+			open("php/reporte_fTecnica.php?id="+id_fTecnica+"");
+		}
+		function eliminar(id_fTecnica){
+			if(confirm("¿Realmente deseas Eliminar la Ficha Técnica?")){
+						f.consulta({
+							sentencia:"DELETE FROM fichas_tecnicas WHERE id_ficha_tecnica=?",
+							parametros:[		
+								new f.parametro({tipo:t.cadena, valor:id_fTecnica,referencia:r.variable})
+							],accion:function(){
+								u.mostrar("work_oper","link/administrador/fTecnicas.html");
+							}
+						});
+					}
+		}
+</script>
+<div class="recuadroT">
+	<label class="title">FICHAS TECNICAS</label>
+	<div name="detalle_servicios">
+		<div name="fichas_tecnicas" class="tabla_consultas"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+			<div class="titulo"><label>Detalle de la Precotización</label></div>
+				
+					
+						<div name="detalle_servicio" id="dServicio" style="display: none;"> 
+							
+						</div>
+								
+				
+		</div>
+	</div>
+</div>

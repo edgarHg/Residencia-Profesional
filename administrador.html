@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!--eHg @softekar-->
+		<!--------------------------------------------------------------------------------------------------------------- -->
+		<title>SIAO</title>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="author" content="EDGAR" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link href="css/estylo.css" rel="stylesheet" type="text/css" />
+		<link href="css/estilo.css" rel="stylesheet" type="text/css" />
+		<link href="css/mensaje.css" rel="stylesheet" type="text/css" />
+		<link href="css/notificacion.css" rel="stylesheet" type="text/css" />
+		<link href="css/validacion.css" rel="stylesheet" type="text/css" />
+		<link href="css/subir.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="css/nav.css">
+		<link href="librerias/jqueryui/css/base/jquery-ui.css" rel="stylesheet">
+		<link href="librerias/jquerytablesorter/addons/pager/jquery.tablesorter.pager.css" rel="stylesheet">
+		<link href="librerias/jquerytablesorter/themes/blue/style.css" rel="stylesheet">
+		<script type="text/javascript" src="js/jquery-1.8.0.js"></script>
+		<script type="text/javascript" src="js/utf8_encode.js"></script>
+		<script type="text/javascript" src="js/md5.js"></script>
+		<script type="text/javascript" src="js/jquery.maskedinput-1.3.js"></script>
+		<script type="text/javascript" src="js/moment.js"></script>
+		<script type="text/javascript" src="js/modernizr.js"></script>
+		<script type="text/javascript" src="librerias/jqueryui/js/jquery-ui-1.9.2.custom.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/jquery.tablesorter.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/jquery.metadata.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
+		<script type="text/javascript" src="js/funciones.js"></script>
+		<script type="text/javascript" src="js/calCotizacion.js"></script>
+		<link href="librerias/datapicker/datepicker.css" rel="stylesheet">
+		<script type="text/javascript" src="librerias/datapicker/datepicker.js"></script>
+		<!--<meta http-equiv="refresh" content="10" />-->
+		
+	<script>
+        	jQuery.fn.reset = function () {
+ 			 $(this).each (function() { this.reset(); });
+				}
+			$(document).ready(function(){
+				u.error();
+					
+				s.validar({
+					nombre:"id_administrador",
+					error:function(){
+						document.location='index.html';
+					},
+					accion:function(){
+						u.cargar("nuevo_cliente", "work_oper", "link/nuevo_clientes.html");
+						u.cargar("todos", "work_oper", "link/clientes.html");
+						u.cargar("nuevo_usuario", "work_oper", "link/administrador/nuevo_usuario.html");
+						u.cargar("todos_usuarios", "work_oper", "link/administrador/usuarios.html");
+						u.cargar("nuevo_servicio", "work_oper", "link/nuevo_servicio.html");
+						u.cargar("en_proceso", "work_oper", "link/servicio_revision.html");
+						u.cargar("servicioautorizado", "work_oper", "link/servicio_aceptados.html");
+						u.cargar("serviciocancelado", "work_oper", "link/servicio_cancelados.html");
+						u.cargar("servicioFinalizado", "work_oper", "link/servicio_finalizados.html");
+						u.cargar("servicioHistorial", "work_oper", "link/servicio_historial.html");
+						u.cargar("nueva_cotizacion", "work_oper", "link/administrador/nueva_cotizacion.html");
+						u.cargar("cotizacion", "work_oper", "link/cotizaciones.html");
+						u.cargar("histo_cotizacion", "work_oper", "link/administrador/historial_cotizaciones.html");
+						u.cargar("nueva_precotizacion", "work_oper", "link/taller/nueva_precotizacion.html");
+						u.cargar("precotizaciones", "work_oper", "link/taller/precotizaciones.html");
+						u.cargar("reparaciones_taller", "work_oper", "link/taller/servicios_reparacion.html");
+						u.cargar("nueva_fichaT", "work_oper", "link/administrador/nueva_fichaT.html");						
+						u.cargar("fichasTecnicas", "work_oper", "link/administrador/fTecnicas.html");															
+						u.cargar("contrasena", "work_oper", "link/contrasena.html");
+						u.elemento("cerrar").click(function(){
+							s.eliminar();
+							document.location='index.html';
+						});
+					f.consulta({
+							sentencia:"SELECT * FROM vw_usuarios WHERE id_usuario=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:"id", referencia:r.sesion})								
+							],
+							accion:function(datos){
+								u.elemento("foto").html("<img width=\"100px\" src=\"img/perfil/"+datos.filas[0].foto_usuario+"\">");
+								u.elemento("nombre").text(datos.filas[0].nombre_completo);
+								u.elemento("usuario").text(datos.filas[0].tipo_usuario);
+								document.getElementById("fecha").innerHTML=moment().format('MMMM Do YYYY');
+								// if(datos.filas[0].estatus_contrasena==0){
+									// if(confirm("Por motivos de seguridad, favor de cambiar su contraseña")){
+										// u.mostrar("work_oper","link/contrasena.html")
+									// }
+								// }
+							}
+						});
+		            }
+		         });
+		        f.combo({
+				elemento:"estados",
+				sentencia:"select * from estados",
+				valor:"id_estado",
+				descripcion:"nombre_estado",
+				cambio:function(){
+					cMunicipios.ejecutar();
+				}
+			});
+			cMunicipios = new f.combo({
+				elemento:"municipios",
+				sentencia:"select * from municipios where id_estado=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:"estados", referencia:r.elemento})
+				  ],
+				valor:"id_municipio",
+				descripcion:"nombre_municipio",				
+			});
+			f.consulta({
+				sentencia:"select * from vw_servicios where id_servicio_actual=1 LIMIT 2",
+				mensajes:false,
+				accion:function(datos){
+					var n=datos.filas.length;
+						for(var i=0; i<n; i++){
+						var tabla="<div class=\"rsul\">Servicio N° "+datos.filas[i].id_servicio+".<br/> "+datos.filas[i].razon_social+"<br/></div>";	
+						u.elemento("sServicios_proceso").append(tabla);
+					}
+				}
+				
+			});
+			f.consulta({
+				sentencia:"select * from vw_servicios_cancelados LIMIT 2",
+				mensajes:false,
+				accion:function(datos){
+					var n=datos.filas.length;
+						for(var i=0; i<n; i++){
+						var tabla="<div class=\"rsul\">Servicio N° "+datos.filas[i].id_servicio+".<br/> "+datos.filas[i].razon_social+"<br/></div>";	
+						u.elemento("sServicios_cancelados").append(tabla);
+					}
+				}
+				
+			});
+			f.consulta({
+				sentencia:"select * from vw_servicios_aceptados  LIMIT 2",
+				mensajes:false,
+				accion:function(datos){
+					var n=datos.filas.length;
+						for(var i=0; i<n; i++){
+						var tabla="<div class=\"rsul\">Servicio N° "+datos.filas[i].id_servicio+".<br/> "+datos.filas[i].razon_social+"<br/></div>";	
+						u.elemento("sServicios_autorizados").append(tabla);
+					}
+				}
+				
+			});
+		});
+	</script>
+	</head>
+	<body>
+		<div class="general">
+		<header>		
+			<div class="name_sistema"> SISTEMA INFORMATICO ADMINISTRATIVO Y DE OPERACIONES</div>
+			<div class="img_logo"> </div>
+			<div class="name_sediap">SERVICIO DE HIDROLAVADORAS ALTA PRESION</div>
+		</header>
+		<div class="cuerpo">
+			<div class="info_usuario">
+				<table class="table_info">
+					<thead>
+						<tr align="center">
+							<td align="center" id="foto"> </td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="nombre"> </td>
+						</tr>
+						<tr>
+							<td id="usuario"> </td>
+						</tr>
+						<tr>
+							<td id="fecha" name="fecha"> </td>
+						</tr>
+						
+					</tbody>
+				</table>
+				<section class="seccion_1">
+					<h4>SERVICIOS EN PROCESO</h4>
+					<div name="sServicios_proceso" style="height:auto;display: inline-block;">
+					
+					</div>
+				</section>
+				<section class="seccion_2">
+					<h4>SERVICIOS CANCELADOS</h4>
+					<div name="sServicios_cancelados" style="height:auto;display: inline-block;">
+					</div>
+				</section>
+				<section class="seccion_1">
+					<h4>SERVICIOS ACEPTADOS</h4>
+					<div name="sServicios_autorizados" style="height:auto; display: inline-block;">
+					</div>
+				</section>
+			</div>
+			<div class="cuerpo_t">
+				<nav id="topNav">
+		        	<ul>
+		            	<li><a href="administrador.html">Inicio</a></li>
+		            	<li><a href="#">Clientes</a>
+		            		<ul>
+		                    	<li><a id="nuevo_cliente">Nuevo</a></li>
+		                    	<li><a id="todos">Todos</a></li>
+		                    </ul>
+		            	</li>
+		   		  		<li><a href="#">Servicios</a>
+		                	<ul>
+		                    	<li><a id="nuevo_servicio">Nuevo</a></li>
+		                    	<li><a id="en_proceso">En Proceso</a></li>
+		                        <li><a id="servicioautorizado">Autorizados</a></li>
+		                        <li><a id="serviciocancelado" >Cancelados</a></li>
+		                        <li><a id="servicioFinalizado">Reparados</a></li>
+		                        <li class="last"><a id="servicioHistorial">Historial</a></li>
+		                    </ul>        
+		                </li>
+		              	<li><a href="#" >Cotizaciones</a>
+		              		<ul>
+		                        <li><a id="nueva_cotizacion" >Nueva Cotización</a></li>
+		                        <li><a id="cotizacion">Cotizaciones</a></li>
+		                         <li><a id="histo_cotizacion">Historial</a></li>
+		              		</ul>
+		              	</li>
+		              	<li><a href="#" >&#160&#160&#160Taller&#160&#160</a>
+		              		<ul>
+		              			<li><a id="nueva_precotizacion">Nueva Precotización</a></li>
+		                        <li><a id="precotizaciones">Precotizaciones</a></li>
+		                         <li><a id="reparaciones_taller">Reparaciones</a></li>
+		              		</ul>
+		              	</li>
+		              	<li><a href="#" >&#160&#160Otros&#160</a>
+		              		<ul>
+		              			<li><a id="nueva_fichaT"><img src="img/ficha_tecnica.png" width="32" height="32" title="Nueva Ficha tecnica"/></a></li>
+		                        <li><a id="fichasTecnicas">Fichas T.</a></li>
+		              		</ul>
+		              	</li>
+		              	<li><a>Usuarios</a>
+		              		<ul>
+		              			<li><a id="nuevo_usuario">Nuevo</a></li>
+		                        <li><a id="todos_usuarios">Todos</a></li>
+		              		</ul>
+		              	</li>
+		              	
+		              	<li><a id="contrasena">Contraseña</a></li>
+		              	<li><a id="cerrar"> Salir</a></li>
+		          </ul>
+	        	</nav>
+				<div class="operaciones">
+					<div class="work_oper" style="padding-top: 30px;">
+						<h1>PROSESOS DEL SISTEMA SIAO</h1>
+						<div class="recuadroI">
+							<label class="title">SERVICIOS</label>
+							<div class="texto">
+								<h2>¿Comó crear un Servicio?</h2>
+								<p>Para crear un Nuevo Servicio; hay que colocar el cursos en el Menú Servicio -> Nuevo.</p><br/>
+								<img src="img/img_servicio.png" width="150" height="150" style="margin-left:60px;"/>
+								<p>
+								   Es importante que si el cliente No existe en nuestra Base de Datos, Hay que agregarlo, por lo
+								   contrario el sistema marcar un error que no existe el cliente y no se podra guardar el nuevo servicio.
+								</p>
+								
+							</div>
+						</div>
+						<div class="recuadroI">
+							<label class="title">COTIZACIONES </label>
+							<h2>¿Comó crear Cotizaciones?</h2>
+							<p>Para crear una nueva cotización es ir al menú cotizaciones -> Nueva Cotización</p><br/>
+							<img src="img/cotizacion.png" width="150" height="150" style="margin-left:60px;"/>
+							<p>Una cotización se crea siempre y cuando el Jefe de Taller realiza la precotización (una precotización
+								es una revisión general del equipo que acaba de llegar al taller, obiamente para esto ya existe un servicio
+								registrado en el sistema.)</p>
+						</div>
+						<div class="recuadroI">
+							<label class="title">NOTA REMISIÓN</label>
+							<h2>¿Comó crear Nota Remisión?</h2>
+							<p>La nota Remisión se crea automaticamente, cuando vas al menú Servicios -> Reparados.</p><br/>
+							
+							<img src="img/img_nota_rm.png" width="150" height="150" style="margin-left:60px;"/>
+							<p>Para que se cree la Nota Remisión, es necesario dar clic en el icono Cobrar.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		<script>
+			(function($){
+				
+				//cache nav
+				var nav = $("#topNav");
+				
+				//add indicator and hovers to submenu parents
+				nav.find("li").each(function() {
+					if ($(this).find("ul").length > 0) {
+						$("<span>").text("^").appendTo($(this).children(":first"));
+
+						//show subnav on hover
+						$(this).mouseenter(function() {
+							$(this).find("ul").stop(true, true).slideDown();
+						});
+						
+						//hide submenus on exit
+						$(this).mouseleave(function() {
+							$(this).find("ul").stop(true, true).slideUp();
+						});
+					}
+				});
+			})(jQuery);
+		</script>
+		<footer>
+				<p>
+					&copy;	EDGAR
+				</p>
+				
+			</footer>
+		</div>
+	</body>
+</html>

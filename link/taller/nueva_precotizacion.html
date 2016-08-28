@@ -1,0 +1,121 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"servicios_revision",
+					sentencia:"select * from vw_servicios_revision",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"100"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Descripcion de la Falla", valor:"#descripcion_falla#",ancho:"200"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"190"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"150"})						
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+					u.elemento("detalle_servicio").hide();
+			u.elemento("detalles_servicio").click(function(){
+				var servicio=$(this).attr("id");
+				document.getElementById("dDetalle").style.display='block';
+				document.getElementById("dPrecotizacion").style.display='block';
+				document.getElementById("dServicio").style.display='block';
+			
+			
+			f.consulta({
+					sentencia:"SELECT * FROM  vw_servicios_revision WHERE id_servicio=?",
+					parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+					],accion:function(datos){
+						f.tabla({
+							elemento:"detalle_servicio",
+							id:"id_servicio",
+							sentencia:"SELECT * FROM  vw_servicios_revision WHERE id_servicio=?",
+							parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+						],
+						columnas:[
+							new f.columna({titulo:"<div style='font-size: 10pt'>Servicio N°: "+datos.filas[0].id_servicio+"<br/> Fecha Creado: "+datos.filas[0].fecha_creacion+" <br/>Creado por: "+datos.filas[0].usuario+"</div>", valor:"<label>Servicio:&#160</label><input class=\"respu\" size=\"24\" value=\"#servicio#\" disabled=\"false\"/>&#160&#160"+
+																				"<input type=\"hidden\" name=\"id_servicio\" value=\"#id_servicio#\"/>"+
+																				"<label>Marca:&#160</label><input class=\"respu\" size=\"23\" value=\"#marca#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Modelo:&#160</label><input class=\"respu\" size=\"23\" value=\"#modelo#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Serie:&#160</label><input class=\"respu\" size=\"25\" value=\"#serie#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Descripción de la falla:</label>"+
+																				"<textarea class=\"text_area\" disabled=\"false\">#descripcion_falla#</textarea>"+
+																				"<label>Accesorios:</label><br />"+
+																				"&#160&#160<label>Manguera:&#160</label><input class=\"respu\" size=\"21\" value=\"#manguera#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Pistola:&#160</label><input class=\"respu\" size=\"21\" value=\"#pistola#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Lanza:&#160</label><input class=\"respu\" size=\"21\" value=\"#lanza#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Boquilla:&#160</label><input class=\"respu\" size=\"21\" value=\"#boquilla#\" disabled=\"false\"/>", ancho:"80"}),
+									
+						]
+						
+					});
+						}
+						
+						
+					});							
+					u.elemento("detalle_servicio").show();
+			});
+			
+				u.elemento("new_precotizacion").submit(function(){
+					
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"precotizacion", tipo:"texto", requerido:true})							
+					],accion:function(){
+						f.consulta({
+								sentencia:"insert into precotizacion(id_servicio,descripcion,id_usuario) values(?,?,?)",
+								parametros:[
+									new f.parametro({tipo:t.cadena, valor:"id_servicio", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"precotizacion", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"id", referencia:r.sesion})
+									],accion:function(){
+										var estatu=43;
+										f.consulta({
+											sentencia:"UPDATE servicios SET id_estatus_servicio=? WHERE id_servicio=?",
+											parametros:[
+												new f.parametro({tipo:t.entero, valor:estatu, referencia:r.variable}),		
+												new f.parametro({tipo:t.cadena, valor:"id_servicio",referencia:r.elemento})
+											]
+										});
+													
+												alert("precotización Guardada con exito");
+												u.mostrar("work_oper", "link/taller/precotizaciones.html");			
+									}		
+							});
+						
+					}
+				});
+			});
+		
+	});
+</script>
+<div class="recuadroT">
+	<label class="title">NUEVA PRECOTIZACIÓN</label>
+	<div name="detalle_servicios">
+		<div name="servicios_revision" class="tabla_consultas"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+			<div class="titulo"><label>Detalle del Servicio</label></div>
+				<form method="post" name="new_precotizacion" id="dPrecotizacion" onSubmit="return false" autocomplete="off">
+					
+						<div name="detalle_servicio" id="dServicio" style="display: none;"> 
+							
+						</div>
+						<div class="formulario">
+							<div  class="filas" style="color:#fff; font-family:font_4; font-size:16px;">
+								&#160&#160Descripción de la Revisión General del Taller:	<br/>
+								&#160&#160<textarea class="text_area" name="precotizacion" style="height: 70px;"></textarea>
+							</div>
+							<br />
+						<div class="recuadro_boton" align="center" style="width:837px; margin-left:0px; ">
+								<input type="submit" class="boton" value="guardar" style="position:static;"/>
+						</div>
+						</div>
+					
+				</form>
+		</div>
+	</div>
+</div>

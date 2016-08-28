@@ -1,0 +1,148 @@
+ <script>
+        	jQuery.fn.reset = function () {
+ 			 $(this).each (function() { this.reset(); });
+				}
+			$(document).ready(function(){
+				u.error();
+		        f.combo({
+				elemento:"estados",
+				sentencia:"select * from estados",
+				valor:"id_estado",
+				descripcion:"nombre_estado",
+				cambio:function(){
+					cMunicipios.ejecutar();
+				}
+			});
+			cMunicipios = new f.combo({
+				elemento:"municipios",
+				sentencia:"select * from municipios where id_estado=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:"estados", referencia:r.elemento})
+				  ],
+				valor:"id_municipio",
+				descripcion:"nombre_municipio",
+				
+			});
+			f.combo({
+				elemento:"genero",
+				sentencia:"SELECT * FROM catalogos WHERE id_padre=4",
+				valor:"id_catalogos",
+				descripcion:"descripcion"
+			});
+			f.combo({
+				elemento:"tipo_usuario",
+				sentencia:"SELECT * FROM tipo_usuarios",
+				valor:"id_tipo_usuario",
+				descripcion:"descripcion"
+			});
+			u.mascara("tel","9999-99-99-99", "-")
+			
+			u.elemento("new_usuario").submit(function(){
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"usuario", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"contrasena", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"tipo_usuario", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"nombre", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"apaterno", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"amaterno", tipo:"texto", requerido:true}),
+						
+						
+						new f.elemento({nombre:"calle", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"colonia", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"estados", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"municipios", tipo:"combo", requerido:true})	
+					],accion:function(){	
+			f.consulta({
+					sentencia:"INSERT INTO usuarios(id_tipo_usuario,usuario,contrasena,nombre,apellido_paterno,apellido_materno)VALUES(?,?,?,?,?,?)",
+					parametros:[
+						new f.parametro({tipo:t.entero, valor:"tipo_usuario", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"usuario", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"contrasena", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"nombre", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"apaterno", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"amaterno", referencia:r.elemento})
+						
+						],accion:function(usuario){							
+							f.consulta({
+								sentencia:"INSERT INTO detalle_usuarios(id_usuario,fecha_nacimiento,id_genero,calle,colonia,numero,id_estado,id_municipio,cel,email)VALUES(?,str_to_date(?,'%d-%m-%Y'),?,?,?,?,?,?,?,?)",
+								parametros:[
+									new f.parametro({tipo:t.entero, valor:usuario.id, referencia:r.variable}),
+									new f.parametro({tipo:t.cadena, valor:"fecha_nacimiento", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"genero", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"calle", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"colonia", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"numero", referencia:r.elemento}),
+									new f.parametro({tipo:t.entero, valor:"estados", referencia:r.elemento}),
+									new f.parametro({tipo:t.entero, valor:"municipios", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"tel", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"correo", referencia:r.elemento})
+							],accion:function(){
+									u.mostrar("work_oper", "link/administrador/usuarios.html");
+								}
+							});
+											
+						}
+						
+				});
+				
+				$("#new_usuario").reset();
+				}
+					
+			});
+		});	
+		});
+	</script>
+	    <script>
+datePickerController.createDatePicker({ 
+        // Associate the text input to a DD/MM/YYYY date format                            
+        formElements:{"fecha_nacimiento":"%d-%m-%Y"}
+        }); 
+    </script> 
+<style type="text/css">
+label.error{
+	background-color: #BC1010;
+	border-radius: 4px;
+	padding: 3px 5px 3px 5px;
+	color: white;
+	font-size:12px;
+	margin-top:17px;
+	margin-left:-60px;
+	position:absolute;
+}
+</style>
+<div class="recuadro">
+	<label class="title">NUEVO USUARIO</label>
+	<form method="post" id="new_usuario" onSubmit="return false" autocomplete="off">
+		<div class="formulario">
+			<div  class="filas">
+				<label class="tInicio"> Usuario:</label>	<input type="text" name="usuario" class="in_cliente" style="width: 100px;"/>
+									    Contraseña:	        <input type="text" name="contrasena" class="in_cliente" style="width: 100px;"/>
+									    Tipo de Usuario:	<select name="tipo_usuario" class="slect" style="width: 110px;"><option value="0">-Seleccione-</option></select>
+			</div>
+			<div  class="filas">
+				<label class="tInicio">Nombre:</label>	    <input type="text" name="nombre" class="in_cliente" style="width: 130px;"/>
+									   Apellido Paterno:	<input type="text" name="apaterno" class="in_cliente" style="width: 165px;"/>
+									   Apellido Materno:	<input type="text" name="amaterno" class="in_cliente" style="width: 165px;"/>
+			</div>
+			<div  class="filas">
+									   Fecha Nacimiento:	<input type="text" class="in_cliente" id="fecha_nacimiento" name="fecha_nacimiento" value="" maxlength="10" style="width:70px;"/>
+									   Genero:				<select name="genero" class="slect" style="width: 110px;"><option value="0">-Seleccione-</option></select>
+									   No Celular:			<input type="text" name="tel" class="in_cliente" style="width: 84px;"/>
+									   Correo:				<input type="text" name="correo" class="in_cliente" style="width: 155px;"/>
+			</div>
+			<div  class="filas">
+									   Calle:				<input type="text" name="calle" class="in_cliente" style="width: 300px;"/>
+									   Colonia:				<input type="text" name="colonia" class="in_cliente" style="width: 260px;"/>
+									   Numero:				<input type="text" name="numero" class="in_cliente" style="width: 45px;"/>
+			</div>
+			<div  class="filas">
+									   Estado: 				<select name="estados" class="slect" style="width: 140px;"><option value="0">-- Seleccione --</option></select>
+									   Municipio:			<select name="municipios" class="slect" style="width: 160px;"><option value="0">-- Seleccione --</option></select>
+			</div>
+			<div class="recuadro_boton" align="center">
+				<div class="mensajes"> </div><input type="submit" class="boton" value="guardar" />
+			</div>
+		</div>
+	</form>
+</div>

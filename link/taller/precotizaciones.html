@@ -1,0 +1,41 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"servicios_revision",
+					sentencia:"select * from vw_servicios_precotizaciones",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"90"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Revisión General del Taller", valor:"#descripcion_precotizacion#",ancho:"220"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"180"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"150"})						
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+					u.elemento("detalle_servicio").hide();
+			u.elemento("detalles_servicio").click(function(){
+				var servicio=$(this).attr("id");
+				
+			});
+	});
+</script>
+<div class="recuadroT">
+	<label class="title">PRECOTIZACIONES</label>
+	<div name="detalle_servicios">
+		<div name="servicios_revision" class="tabla_consultas"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+			<div class="titulo"><label>Detalle de la Precotización</label></div>
+				
+					
+						<div name="detalle_servicio" id="dServicio" style="display: none;"> 
+							
+						</div>
+								
+				
+		</div>
+	</div>
+</div>

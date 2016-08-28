@@ -1,0 +1,156 @@
+ <script>
+        jQuery.fn.reset = function () {
+ 			 $(this).each (function() { this.reset(); });
+			}
+			$(document).ready(function(){
+				u.error();
+				f.combo({
+					elemento:"servicio",
+					sentencia:"select * from catalogos where id_padre=12",
+					valor:"id_catalogos",
+					descripcion:"descripcion",
+					cambio:function(){
+						cMarcas.ejecutar();
+					}
+				});
+				cMarcas = new f.combo({
+					elemento:"marca",
+					sentencia:"select * from catalogos where id_padre=?",
+					parametros:[
+						new f.parametro({tipo:t.entero, valor:"servicio", referencia:r.elemento})
+					],
+					valor:"id_catalogos",
+					descripcion:"descripcion"		
+				});
+				f.combo({
+					elemento:"boquilla",
+					sentencia:"select * from catalogos where id_padre=38",
+					valor:"id_catalogos",
+					descripcion:"descripcion"
+				});
+				f.autocompletar({
+					elemento:"auto_razon_social",
+					sentencia:"select * from vw_clientes",
+					valor:"razon_social",
+					descripcion:"razon_social",
+					//categoria:"id_tipo_usuario",
+					cambio:function(datos){
+						document.new_servicio.cliente.value=datos.id_cliente;
+						
+					}
+				});
+				u.casilla("manguera",36,37);
+				u.casilla("pistola",36,37);
+				u.casilla("lanza",36,37);
+				u.mascara("telefono","9999-99-99-99", "-")
+				u.mascara("rfc", "aaaa999999***", "_")
+				
+			u.elemento("new_servicio").submit(function(){
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"auto_razon_social", tipo:"alfanumerico", requerido:true}),
+						new f.elemento({nombre:"atencion", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"correo", tipo:"correo", requerido:true}),
+						new f.elemento({nombre:"telefono", tipo:"alfanumerico", requerido:true}),
+						new f.elemento({nombre:"servicio", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"marca", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"modelo", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"descripcion_falla", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"boquilla", tipo:"combo", requerido:true})
+							
+					],accion:function(){	
+			f.consulta({
+					sentencia:"insert into servicios(id_cliente,atencion,correo,telefono,rfc,id_tipo_servicio,id_marca,modelo,serie,descripcion_falla,id_usuario) values(?,?,?,?,?,?,?,?,?,?,?)",
+					parametros:[
+						new f.parametro({tipo:t.cadena, valor:"cliente", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"atencion", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"correo", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"telefono", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"rfc", referencia:r.elemento}),	
+						new f.parametro({tipo:t.cadena, valor:"servicio", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"marca", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"modelo", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"serie", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"descripcion_falla", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"id", referencia:r.sesion}),						
+						],
+						accion:function(date){
+							f.consulta({
+								sentencia:"insert into servicio_accesorios(id_servicio,id_manguera,id_pistola,id_lanza,id_boquilla) values(?,?,?,?,?)",
+								parametros:[
+									new f.parametro({tipo:t.cadena, valor:date.id, referencia:r.variable}),
+									new f.parametro({tipo:t.cadena, valor:"manguera", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"pistola", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"lanza", referencia:r.elemento}),
+									new f.parametro({tipo:t.cadena, valor:"boquilla", referencia:r.elemento})
+									],
+								accion:function(){
+										$("#new_servicio").reset();
+										u.elemento("manguera").removeAttr("checked");
+										u.elemento("pistola").removeAttr("checked");
+										u.elemento("lanza").removeAttr("checked");
+										
+										servicio= window.open("php/reporte_servicio.php?id="+date.id+"","servicio","sizable=no, scrollbars=no");
+									},
+								mensaje:false
+							});
+						}	
+				});
+				}
+					
+			});
+		});	
+		
+		});
+	</script>
+<style type="text/css">
+label.error{
+	background-color: #BC1010;
+	border-radius: 4px;
+	padding: 3px 5px 3px 5px;
+	color: white;
+	font-size:12px;
+	margin-top:17px;
+	margin-left:-60px;
+	position:absolute;
+}
+</style>
+<div class="recuadro">
+	<label class="title">NUEVO SERVICIO</label>
+	<form method="post" id="new_servicio" name="new_servicio" onSubmit="return false" autocomplete="off">
+		<div class="formulario">
+			<div  class="filas">
+							<div name="n_servicio"> </div>
+			</div>
+			<div  class="filas">
+							Razón Social:	<input name="auto_razon_social" type="text" class="in_cliente" style="width: 340px;" autocomplete="on"/><input type="hidden" name="cliente" value="0"/>
+							Atención:		<input type="text" name="atencion" class="in_cliente" style="width: 285px;"/>
+			</div>
+			<div  class="filas">
+							Correo:			<input type="text" name="correo" class="in_cliente" style="width: 300px;"/>
+							Telefóno:		<input type="text" name="telefono" class="in_cliente" style="width: 130px;"/>
+							R.F.C:			<input type="text" name="rfc" class="in_cliente" style="width: 175px;"/>
+			</div>
+			<div  class="filas">
+							Servicio: 		<select name="servicio" class="slect" style="width: 115px;"><option value="0">-Seleccione-</option></select>
+							Marca:			<select name="marca" class="slect" style="width: 115px;"><option value="0">-Seleccione-</option></select>
+							Modelo:			<input type="text" name="modelo" class="in_cliente" style="width: 140px;"/>
+							Serie:			<input type="text" name="serie" class="in_cliente" style="width: 190px;"/>
+			</div>
+			<div  class="filas">
+							Descripción de la Falla:<br />
+							<textarea class="text_area" name="descripcion_falla"></textarea>		   
+			</div>
+			<div  class="filas">
+							Accesorios:<br />
+							Manguera: 				<input type="checkbox" name="manguera" style="width: 20px;"/>
+							&#160 &#160 Pistola: 	<input type="checkbox" name="pistola"  style="width: 20px;"/>
+							&#160 &#160 Lanza: 		<input type="checkbox" name="lanza" 	style="width: 20px;"/>
+							&#160 &#160 Boquilla:	<select name="boquilla" class="slect" style="width: 115px;"><option value="0">-Seleccione-</option></select>
+			</div>
+			<div class="recuadro_boton" align="center">
+				<input type="submit" class="boton" value="guardar" style="position:static;"/><div class="mensajes"> </div>
+			</div>
+		</div>
+	</form>
+</div>

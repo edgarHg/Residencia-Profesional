@@ -1,0 +1,21 @@
+@charset "utf-8";
+/* Copyright(c) 2013, eHg */
+
+label.error{
+	background-color: #BC1010;
+	border-radius: 4px;
+	padding: 3px 5px 3px 5px;
+	color: white;
+	font-size:12px;
+	margin-left:-40px;
+	position:absolute;
+	float: left;
+}
+label.correcto{
+	background-color:#090;
+	border-radius: 4px;
+	padding: 3px 5px 3px 5px;
+	color: white;
+	font-size:12px;
+	margin-left:2px;
+}

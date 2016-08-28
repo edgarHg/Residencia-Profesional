@@ -1,0 +1,118 @@
+<script>
+		$(document).ready(function(){
+				f.tabla({
+					elemento:"clientes",
+					sentencia:"select * from vw_clientes",
+					columnas:[
+						new f.columna({titulo:"Razon Social", valor:"<div class=\"hover\">#razon_social#</div>",ancho:"240"}),
+						new f.columna({titulo:"Telefóno", valor:"#telefono#",ancho:"60"}),
+						new f.columna({titulo:"Dirección", valor:"#direccion#",ancho:"330"}),
+						new f.columna({titulo:"Fecha de Registro", valor:"#usuario_registrado#",ancho:"150"}),
+						new f.columna({titulo:"Accion", valor:"<a name=\"eliminar_cliente\" id=\"#id_cliente#\"><img src=\"img/rechazar_cotiz.png\" width=\"24\"  title=\"Eliminar Cliente\"/></a><a name=\"edita_cliente\" id=\"#id_cliente#\"><img src=\"img/editar.png\" width=\"24\" title=\"Editar Cliente\"/></a>",ancho:"70"}),
+					],
+					ver:["10","15"],
+					clasificador:true,
+					contador:true,
+					paginador:true
+				});
+				u.elemento("editar_cliente").hide();
+				u.elemento("edita_cliente").click(function(){
+						var cliente=$(this).attr("id");
+						document.getElementById("boton_edit").style.display='block';
+						f.tabla({
+							elemento:"editar_cliente",
+							id:"id_cliente",
+							sentencia:"SELECT * FROM vw_cliente_editar WHERE id_cliente=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:cliente, referencia:r.variable})
+							],
+							columnas:[
+								new f.columna({titulo:"<div style='font-size: 10pt'>EDITAR CLIENTE</div>", valor:																	
+														"<label>Razón social:&#160</label>&#160<input name=\"razon_social\" class=\"respu\" size=\"80\" value=\"#razon_social#\"/>&#160&#160"+
+														"<label>Telefono:&#160</label>&#160<input name=\"telefono\" class=\"respu\" size=\"10\" value=\"#telefono#\" />&#160&#160<br/>"+
+														"<label>Calle:&#160</label>&#160<input name=\"calle\" class=\"respu\" size=\"60\" value=\"#calle#\" />&#160&#160"+
+														"<label>Numero:&#160</label>&#160<input name=\"numero\" class=\"respu\" size=\"10\" value=\"#numero#\" />&#160&#160<br/>"+
+														"<label>Colonia:&#160</label>&#160<input name=\"colonia\" class=\"respu\" size=\"55\" value=\"#colonia#\" />&#160&#160"+
+														"<label>Estado:&#160</label>&#160<select name=\"estados\" class=\"slect\"><option value=\"#id_estado#\">#estado#</option></select>&#160&#160"+
+														"<label>Municipios:&#160</label>&#160<select name=\"municipios\" class=\"slect\"><option value=\"#id_municipio#\">#municipio#</option></select>"
+														 , ancho:"910"})	
+							],accion:function(){
+								 f.combo({
+									elemento:"estados",
+									sentencia:"select * from estados",
+									valor:"id_estado",
+									descripcion:"nombre_estado",
+									cambio:function(){
+										cMunicipios.ejecutar();
+									}
+								});
+								cMunicipios = new f.combo({
+									elemento:"municipios",
+									sentencia:"select * from municipios where id_estado=?",
+									parametros:[
+										new f.parametro({tipo:t.entero, valor:"estados", referencia:r.elemento})
+									  ],
+									valor:"id_municipio",
+									descripcion:"nombre_municipio",
+									
+								});
+								u.mascara("telefono","999-99-99", "-");
+								u.elemento("edit_cliente").submit(function(){
+									f.validar({
+										elementos:[
+											new f.elemento({nombre:"razon_social", tipo:"alfanumerico", requerido:true}),
+											new f.elemento({nombre:"calle", tipo:"texto", requerido:true}),
+											new f.elemento({nombre:"colonia", tipo:"texto", requerido:true}),
+											new f.elemento({nombre:"estados", tipo:"combo", requerido:true}),
+											new f.elemento({nombre:"municipios", tipo:"combo", requerido:true})	
+										],accion:function(){	
+											f.consulta({
+												sentencia:"UPDATE clientes SET razon_social=?, telefono=?, calle=?, numero=?, colonia=?, id_municipio=?, id_estado=?, id_estatus=2 WHERE id_clientes=?",
+												parametros:[
+													new f.parametro({tipo:t.cadena, valor:"razon_social", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"telefono", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"calle", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"numero", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"colonia", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"municipios", referencia:r.elemento}),
+													new f.parametro({tipo:t.cadena, valor:"estados", referencia:r.elemento}),
+													new f.parametro({tipo:t.entero, valor:cliente, referencia:r.variable}),														
+													], accion:function(){
+														alert("Su modificación fue guardada con exito");
+														u.mostrar("work_oper", "link/clientes.html");
+													}	
+												});	
+											}			
+									});
+								});	
+							}
+						});
+					u.elemento("editar_cliente").show();
+				});	
+				u.elemento("eliminar_cliente").click(function(){
+					var eliminar=$(this).attr("id");
+					if(confirm("¿Realmente deseas Eliminar al cliente?")){
+						f.consulta({
+							sentencia:"DELETE FROM clientes WHERE id_clientes=?",
+							parametros:[		
+								new f.parametro({tipo:t.cadena, valor:eliminar,referencia:r.variable})
+							],accion:function(){
+								u.mostrar("work_oper","link/clientes.html");
+							}
+						});
+					}
+				});
+			});
+</script>
+<div class="recuadroT">
+	<label class="title">NUESTROS CLIENTES</label>
+	<div name="clientes" class="tabla_consultas"> </div>
+	<form method="post" name="edit_cliente" onSubmit="return false" autocomplete="off" >
+		<div class="detalles">
+		<div name="editar_cliente"> </div>
+		</div>
+		<div class="recuadro_boton" align="center" style="margin-left:0px; display: none;" id="boton_edit">
+				<input type="submit" class="boton" value="guardar" /><div class="mensajes"> </div>
+			</div>
+	</form>
+</div>

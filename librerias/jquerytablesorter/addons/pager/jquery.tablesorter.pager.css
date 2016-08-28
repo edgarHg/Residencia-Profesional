@@ -1,0 +1,54 @@
+div.tablesorterPager {
+	padding: 10px 0 10px 0;
+	background-color: #D6D2C2;
+	text-align: center;
+}
+div.tablesorterPager span {
+	padding: 0 5px 0 5px;
+}
+div.tablesorterPager input.prev {
+	width: auto;
+	margin-right: 10px;
+}
+div.tablesorterPager input.next {
+	width: auto;
+	margin-left: 10px;
+}
+div.tablesorterPager input {
+	font-size: 8px;
+	width: 50px;
+	border: 1px solid #330000;
+	text-align: center;
+}
+/*Actualizado por eHg, 26/01/2013, 11:30 AM*/
+div.pager img{
+	position:static;
+	top:2px;
+	margin-left:2px;
+	margin-right:2px;
+}
+div.pager img.first{
+	content:url(icons/first.png);
+}
+div.pager img.prev{
+	content:url(icons/prev.png);
+}
+div.pager img.next{
+	content:url(icons/next.png);
+}
+div.pager img.last{
+	content:url(icons/last.png);
+}
+div.pager select.page{
+	width:45px;
+	height:22px;
+	margin-left:10px;
+}
+div.pager input.pagedisplay{
+	width:30px;
+}
+div.pager select.pagesize{
+	width:45px;
+	height:22px;
+	margin-right:10px;
+}

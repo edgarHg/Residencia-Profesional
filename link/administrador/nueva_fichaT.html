@@ -1,0 +1,56 @@
+<script>
+		$(document).ready(function(){
+			u.elemento("new_fTecnica").submit(function(){
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"titulo", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"precio", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"marca", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"modelo", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"descripcion_g", tipo:"texto", requerido:true}),							
+					],accion:function(){
+						u.mostrar("work_oper", "link/administrador/fTecnicas.html");
+					}
+				});	
+			});
+			
+		});
+
+</script>		
+
+<style type="text/css">
+label.error{
+	background-color: #BC1010;
+	border-radius: 4px;
+	padding: 3px 5px 3px 5px;
+	color: white;
+	font-size:12px;
+	margin-top:17px;
+	margin-left:-60px;
+	position:absolute;
+}
+</style>
+<div class="recuadro">
+	<label class="title">NUEVA FICHA TECNICA</label>
+	<form  name="new_fTecnica" method="post" id="new_ficha_tecnica" autocomplete="off" action="php/recibirImg.php" enctype="multipart/form-data" target="_blank">
+		<div class="formulario">
+			<div  class="filas">
+				<label class="tInicio"> Titulo:</label>	    <input type="text" name="titulo" class="in_cliente" style="width: 450px;"/>
+										Precio: $				<input type="text" name="precio" class="in_cliente" style="width: 150px;"/>
+			</div>
+			<div  class="filas">
+				<label class="tInicio">Marca:</label>	    <input type="text" name="marca" class="in_cliente" style="width: 130px;"/>
+									   Modelo:				<input type="text" name="modelo" class="in_cliente" style="width: 165px;"/>
+			</div>
+			<div  class="filas">
+									   Descripción General:	<textarea class="text_area" name="descripcion_g"  style="height: 120px;"></textarea>
+			</div>
+			<div  class="filas">
+									   Cargar Imagen:		<input type="file" name="imagen" class="in_cliente" style="width: 400px;"/>
+			</div>
+			<div class="recuadro_boton" align="center">
+				<div class="mensajes"> </div><input type="submit" class="boton" value="guardar"/>
+			</div>
+		</div>
+	</form>
+</div>

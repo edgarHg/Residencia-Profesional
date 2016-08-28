@@ -1,0 +1,27 @@
+<script>
+		$(document).ready(function(){
+				f.tabla({
+					elemento:"cotizaciones",
+					sentencia:"select * from vw_cotizaciones_general",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"90"}),
+						new f.columna({titulo:"Razón Social", valor:"#razon_social#",ancho:"200"}),
+						new f.columna({titulo:"atencion", valor:"#atencion#",ancho:"160"}),
+						new f.columna({titulo:"Total", valor:"#total#",ancho:"90"}),
+						new f.columna({titulo:"Fecha Creada", valor:"#fecha_creacion#",ancho:"140"}),
+						new f.columna({titulo:"Acciones", valor:"<a target=\"_blank\" href=\"php/reporte_cotizacion.php?id=#id_cotizacion#\"><img src=\"img/pdf.png\" title=\"PDF cotización\"/></a>",ancho:"120"})
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});	
+	});
+</script>
+<div class="recuadroT">
+	<label class="title">COTIZACIONES</label>
+	<div name="detalle_servicios">
+		<div name="cotizaciones" class="tabla_consultas"> </div>
+			
+			
+	</div>
+</div>

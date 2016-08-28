@@ -1,0 +1,155 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"servicios_revision",
+					sentencia:"select * from vw_servicios where id_servicio_actual=1",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"80"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"200"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"120"}),
+						new f.columna({titulo:"Estatus", valor:"#estatus_servicio#",ancho:"80"}),
+						new f.columna({titulo:"Acciones", valor:"<a target=\"_blank\" href=\"php/reporte_servicio.php?id=#id_servicio#\"><img src=\"img/h_servicio.png\" title=\"PDF Servicio\"/></a>"+
+																"<a onclick=\"cotizacion_pdf(#id_estatus_servicio#,#id_cotizacion#)\"><img src=\"img/pdf_cotizacion.png\" title=\"PDF Cotizacion\"</a>"+
+																"<a onclick=\"aceptar_servicio(#id_estatus_servicio#,#id_servicio#)\"><img src=\"img/aceptar_cotiz.png\" title=\"Aceptar cotización\"/></a>"+
+																"<a onclick=\"cancelar_servicio(#id_servicio#)\"><img src=\"img/rechazar_cotiz.png\" title=\"Rechazar cotización\"/></a>",ancho:"150"})
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+					u.elemento("detalle_clientw").hide();
+			u.elemento("detalles_servicio").click(function(){
+				var servicio=$(this).attr("id");
+				document.getElementById("dDetalle").style.display='block';
+				document.getElementById("dCliente").style.display='block';
+				document.getElementById("dAtencion").style.display='block';
+				document.getElementById("dServicio").style.display='block';
+			f.tabla({
+				elemento:"detalle_cliente",
+				id:"id_servicio",
+				sentencia:"SELECT * FROM  vw_servicios WHERE id_servicio=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+				],
+				columnas:[
+					new f.columna({titulo:"<div style='font-size: 10pt'>Detalle del Cliente</div>",valor:"<label>Razón social:&#160</label>&#160<input class=\"respu\" size=\"92\" value=\"#razon_social#\" disabled=\"false\"/>&#160&#160"+
+																										  "<label>R.F.C.&#160</label>&#160<input class=\"respu\" size=\"33\" value=\"#rfc_cliente#\" disabled=\"false\"/>"+
+																										  "<label>Dirección:&#160</label>&#160<input class=\"respu\" size=\"100\" value=\"#direccion_cliente#\" disabled=\"false\"/>&#160&#160"+
+																										  "<label>Telefóno:&#160</label>&#160<input class=\"respu\" size=\"23\" value=\"#telefono_cliente#\" disabled=\"false\"/>&#160&#160", ancho:"800"})
+					
+				],accion:function(){
+					f.tabla({
+						elemento:"detalle_atencion",
+						id:"id_servicio",
+						sentencia:"SELECT * FROM  vw_servicios WHERE id_servicio=?",
+						parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+						],
+						columnas:[
+							new f.columna({titulo:"<div style='font-size: 10pt'>Detalle de la Atención</div>", valor:"<label>Nombre:&#160</label>&#160<input class=\"respu\" size=\"94\" value=\"#atencion#\" disabled=\"false\"/>&#160&#160"+
+																				  "<label>R.F.C.&#160</label>&#160<input class=\"respu\" size=\"36\" value=\"#rfc_atencion#\" disabled=\"false\"/>"+
+																				  "<label>Correo:&#160</label>&#160<input class=\"respu\" size=\"96\" value=\"#correo#\" disabled=\"false\"/>&#160&#160"+
+																				  "<label>Telefóno:&#160</label>&#160<input class=\"respu\" size=\"30\" value=\"#tel_atencion#\" disabled=\"false\"/>&#160&#160", ancho:"80"}),
+							
+						],accion:function(datos){
+						f.tabla({
+						elemento:"detalle_servicio",
+						id:"id_servicio",
+						sentencia:"SELECT * FROM  vw_servicios WHERE id_servicio=?",
+						parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+						],
+						columnas:[
+							new f.columna({titulo:"<div style='font-size: 10pt'>Servicio N°: "+datos.filas[0].id_servicio+"<br/> Fecha Creado: "+datos.filas[0].fecha_creacion+" <br/>Creado por: "+datos.filas[0].usuario+"</div>", valor:"<label>Servicio:&#160</label><input class=\"respu\" size=\"24\" value=\"#servicio#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Marca:&#160</label><input class=\"respu\" size=\"23\" value=\"#marca#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Modelo:&#160</label><input class=\"respu\" size=\"23\" value=\"#modelo#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Serie:&#160</label><input class=\"respu\" size=\"25\" value=\"#serie#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Descripción de la falla:</label>"+
+																				"<textarea class=\"text_area\" disabled=\"false\">#descripcion_falla#</textarea>"+
+																				"<label>Accesorios:</label><br />"+
+																				"&#160&#160<label>Manguera:&#160</label><input class=\"respu\" size=\"21\" value=\"#manguera#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Pistola:&#160</label><input class=\"respu\" size=\"21\" value=\"#pistola#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Lanza:&#160</label><input class=\"respu\" size=\"21\" value=\"#lanza#\" disabled=\"false\"/>&#160&#160"+
+																				"&#160&#160<label>Boquilla:&#160</label><input class=\"respu\" size=\"21\" value=\"#boquilla#\" disabled=\"false\"/>", ancho:"80"}),
+									
+						]
+						
+					});	
+						}
+					});	
+				}
+				});
+					
+					u.elemento("detalle_cliente").show();
+			});	
+	});
+	function cotizacion_pdf(id_estatus,id_cotizacion) {
+		if(id_cotizacion==""){
+			alert("Error, No se ha cotizado");
+		}
+		else{
+			
+			open("php/reporte_cotizacion.php?id="+id_cotizacion+"");
+		}
+	}
+	function aceptar_servicio(id_estatus,id_servicio){
+		if(id_estatus==31){
+					var estatu=34;
+					if(confirm("¿Realmente deseas Aceptar la cotización?")){
+						f.consulta({
+							sentencia:"UPDATE servicios SET id_estatus_servicio=? WHERE id_servicio=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:estatu, referencia:r.variable}),		
+								new f.parametro({tipo:t.cadena, valor:id_servicio,referencia:r.variable})
+							],accion:function(){
+								u.mostrar("work_oper","link/servicio_revision.html");
+							}
+						});	
+					}
+		}else{
+			alert("No se puede aceptar el servicio");
+		}
+	}
+	function cancelar_servicio(id_servicio){
+		var estatu=33;
+					if(confirm("¿Realmente deseas Cancelar la cotización?")){
+						f.consulta({
+							sentencia:"UPDATE servicios SET id_estatus_servicio=? WHERE id_servicio=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:estatu, referencia:r.variable}),		
+								new f.parametro({tipo:t.cadena, valor:id_servicio,referencia:r.variable})
+							],accion:function(){
+								u.mostrar("work_oper","link/servicio_revision.html");
+							}
+						});
+					}
+	}		  
+</script>
+<div class="recuadroT">
+	<label class="title">SERVICIO EN PROCESO</label>
+	<div name="detalle_servicios">
+		<div name="servicios_revision" class="tabla_consultas"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+			<div class="titulo"><label>Detalle del Servicio</label></div>
+				
+					
+					<div name="detalle_cliente" id="dCliente" style="display: none;"> 
+						
+					</div>
+				
+					<div name="detalle_atencion" id="dAtencion" style="display: none;"> 
+						
+					</div>
+				
+					
+					<div name="detalle_servicio" id="dServicio" style="display: none;"> 
+						
+					</div>
+				
+		</div>
+		<a onclick=""></a>
+	</div>
+</div>

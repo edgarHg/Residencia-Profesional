@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!--eHg @softekar-->
+		<!--------------------------------------------------------------------------------------------------------------- -->
+		<title>SIAO</title>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="author" content="EDGAR" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link href="css/estylo.css" rel="stylesheet" type="text/css" />
+		<link href="css/estilo.css" rel="stylesheet" type="text/css" />
+    	<link href="css/mensaje.css" rel="stylesheet" type="text/css" />
+        <link href="css/notificacion.css" rel="stylesheet" type="text/css" />
+		<link href="css/validacion.css" rel="stylesheet" type="text/css" />
+		<link href="css/subir.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="css/nav.css">
+		<link href="librerias/jqueryui/css/base/jquery-ui.css" rel="stylesheet">
+		<link href="librerias/jquerytablesorter/addons/pager/jquery.tablesorter.pager.css" rel="stylesheet">
+		<link href="librerias/jquerytablesorter/themes/blue/style.css" rel="stylesheet">
+		<script type="text/javascript" src="js/jquery-1.8.0.js"></script>
+		<script type="text/javascript" src="js/utf8_encode.js"></script>
+    	<script type="text/javascript" src="js/md5.js"></script>
+		<script type="text/javascript" src="js/jquery.maskedinput-1.3.js"></script>
+		<script type="text/javascript" src="js/moment.js"></script>
+			
+		<script type="text/javascript" src="js/modernizr.js"></script>
+		<script type="text/javascript" src="librerias/jqueryui/js/jquery-ui-1.9.2.custom.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/jquery.tablesorter.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/jquery.metadata.js"></script>
+		<script type="text/javascript" src="librerias/jquerytablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
+        <script type="text/javascript" src="js/funciones.js"></script>
+        <!--<meta http-equiv="refresh" content="10" />-->
+        <script>
+		$(document).ready(function(){
+				u.error();
+				f.autocompletar({
+					elemento:"auto",
+					sentencia:"select * from vw_clientes",
+					valor:"id_cliente",
+					descripcion:"razon_social",
+					//categoria:"id_tipo_usuario",
+					cambio:function(datos){
+						alert(datos.razon_social);
+					}
+				});
+			});
+	</script>
+	</head>
+	<body>
+		<input name="auto" type="text" />
+		<footer>
+				<p>
+					&copy;	EDGAR
+				</p>
+				
+			</footer>
+		
+	</body>
+</html>

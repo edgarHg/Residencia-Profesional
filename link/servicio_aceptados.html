@@ -1,0 +1,30 @@
+<script>
+		$(document).ready(function(){
+			
+				f.tabla({
+					elemento:"servicios_aceptados",
+					sentencia:"select * from vw_servicios_aceptados",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"#id_servicio#",ancho:"80"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"180"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"150"}),
+						new f.columna({titulo:"Subtotal", valor:"#subtotal#",ancho:"60"}),
+						new f.columna({titulo:"Iva", valor:"#iva#",ancho:"60"}),
+						new f.columna({titulo:"Total", valor:"#total#",ancho:"60"}),
+						new f.columna({titulo:"Acciones", valor:"<a target=\"_blank\" href=\"php/reporte_servicio.php?id=#id_servicio#\"><img src=\"img/h_servicio.png\" title=\"PDF Servicio\"/></a>"+
+																"<a target=\"_blank\" href=\"php/reporte_cotizacion.php?id=#id_cotizacion#\"><img src=\"img/pdf_cotizacion.png\" title=\"PDF Cotizacion\"/></a>",ancho:"90"})
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});		
+	});
+</script>
+<div class="recuadroT">
+	<label class="title">SERVICIO AUTORIZADOS</label>
+	<div name="detalle_servicios">
+		<div name="servicios_aceptados" class="tabla_consultas"> </div>
+	</div>
+</div>

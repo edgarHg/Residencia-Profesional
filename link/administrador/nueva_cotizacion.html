@@ -1,0 +1,429 @@
+<script>
+jQuery.fn.reset = function () {
+ 			 $(this).each (function() { this.reset(); });
+				}
+		$(document).ready(function(){
+				f.tabla({
+					elemento:"servicios_precotizacion",
+					sentencia:"select * from vw_servicios_precotizaciones",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"90"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Marca", valor:"#marca#",ancho:"80"}),
+						new f.columna({titulo:"Revisión General del Taller", valor:"#descripcion_precotizacion#",ancho:"220"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"180"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"150"})						
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+			u.elemento("detalle_servicio").hide();
+			u.elemento("detalles_servicio").click(function(){
+				$("#dCotizacion").reset();
+				var servicio=$(this).attr("id");
+				var icono=document.getElementById("oc_img");
+					icono.src ="img/mostrar.png";
+					icono.title ="Mostrar";
+					document.getElementById("dServicio_preco").style.display='none';
+					document.getElementById("dDetalle").style.display='block';
+					document.getElementById("dCotizacion").style.display='block';
+					document.getElementById("dServicio").style.display='block';
+			f.consulta({
+					sentencia:"SELECT * FROM  vw_servicios_precotizaciones WHERE id_servicio=?",
+					parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+					],accion:function(datos){
+						f.tabla({
+							elemento:"detalle_servicio",
+							id:"id_servicio",
+							sentencia:"SELECT * FROM vw_servicios_precotizaciones WHERE id_servicio=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+							],
+							columnas:[
+								new f.columna({titulo:"<div style='font-size: 10pt'>Servicio N°: "+datos.filas[0].id_servicio+"<br/> Fecha Creado: "+datos.filas[0].fecha_creacion+" <br/>Creado por: "+datos.filas[0].usuario+"</div>", valor:"<label>Servicio:&#160</label><input class=\"respu\" size=\"24\" value=\"#servicio#\" disabled=\"false\"/>&#160&#160"+
+																				"<input type=\"hidden\" name=\"id_servicio\" value=\"#id_servicio#\"/>"+
+																				"<label>Marca:&#160</label><input class=\"respu\" size=\"23\" value=\"#marca#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Modelo:&#160</label><input class=\"respu\" size=\"23\" value=\"#modelo#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Serie:&#160</label><input class=\"respu\" size=\"25\" value=\"#serie#\" disabled=\"false\"/>&#160&#160"+
+																				"<label>Revisión General del Taller por: #usuario_precotizacion#, el día: #fecha_creacion_preco# </label>"+
+																				"<textarea class=\"text_area\" disabled=\"false\">#descripcion_precotizacion#</textarea>", ancho:"80"}),	
+							],accion:function(date){
+								f.tabla({
+								elemento:"detalle_cotizacion",
+								id:"id_servicio",
+								sentencia:"SELECT * FROM vw_servicios_precotizaciones WHERE id_servicio=?",
+								parametros:[
+									new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+								],
+								columnas:[
+									new f.columna({titulo:"<div style='font-size: 10pt'><input type=\"hidden\" name=\"id_servicio\" value="+datos.filas[0].id_servicio+">Cotización del Servicio N°: "+datos.filas[0].id_servicio+"</div>", valor:"<label>Razón Social:&#160&#160</label><input class=\"respu\" size=\"141\" value=\"#razon_social#\" disabled=\"false\"/><br/>&#160"+
+																				"<label>Dirección:&#160&#160</label><input class=\"respu\" size=\"144\" value=\"#direccion_cliente#\" disabled=\"false\"/>&#160<br/>"+
+																				"<label>Atención:&#160&#160</label><input class=\"respu\" size=\"145\" value=\"#atencion#\" disabled=\"false\"/>"
+																				, ancho:"900"}),	
+								]						
+								});
+							
+							}						
+						});
+						}
+					});									
+					u.elemento("detalle_servicio").show();
+			});	
+			u.elemento("new_cotizacion").submit(function(){
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"cantidad1", tipo:"numero", requerido:true}),
+						new f.elemento({nombre:"descripcion1", tipo:"alfanumerico", requerido:true}),
+						new f.elemento({nombre:"punitario1", tipo:"numero", requerido:true}),
+						new f.elemento({nombre:"condiciones", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"plazo_entrega", tipo:"combo", requerido:true}),
+						
+					],accion:function(){	
+						f.consulta({
+							sentencia:"insert into cotizaciones(id_servicio,id_condicion,vigencia,id_plazo,subtotal,iva,total,id_usuario) values(?,?,?,?,?,?,?,?)",
+							parametros:[
+								new f.parametro({tipo:t.cadena, valor:"id_servicio", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"condiciones", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"vigencia", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"plazo_entrega", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"subtotal", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"iva", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"total", referencia:r.elemento}),
+								new f.parametro({tipo:t.cadena, valor:"id", referencia:r.sesion})						
+								],accion:function(cotizacion){
+									 f.consulta({
+										 sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										 parametros:[
+											 new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											 new f.parametro({tipo:t.cadena, valor:"cantidad1", referencia:r.elemento}),
+											 new f.parametro({tipo:t.cadena, valor:"descripcion1", referencia:r.elemento}),
+											 new f.parametro({tipo:t.cadena, valor:"punitario1", referencia:r.elemento}),
+											 new f.parametro({tipo:t.cadena, valor:"resultado1", referencia:r.elemento})						
+										 ]
+									 });
+									 
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad2", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion2", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario2", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado2", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad3", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion3", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario3", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado3", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad4", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion4", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario4", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado4", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad5", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion5", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario5", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado5", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad6", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion6", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario6", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado6", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad7", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion7", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario7", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado7", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad8", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion8", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario8", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado8", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad9", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion9", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario9", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado9", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad10", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion10", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario10", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado10", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad11", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion11", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario11", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado11", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad12", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion12", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario12", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado12", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad13", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion13", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario13", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado13", referencia:r.elemento})						
+										]
+									});
+									f.consulta({
+										sentencia:"insert into detalle_cotizaciones(id_cotizacion,cantidad,descripcion,p_unitario,p_total) values(?,?,?,?,?)",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:cotizacion.id, referencia:r.variable}),
+											new f.parametro({tipo:t.cadena, valor:"cantidad14", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"descripcion14", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"punitario14", referencia:r.elemento}),
+											new f.parametro({tipo:t.cadena, valor:"resultado14", referencia:r.elemento})						
+										],accion:function(){
+											f.consulta({
+												sentencia:"UPDATE servicios SET id_estatus_servicio=31 WHERE id_servicio=?",
+												parametros:[
+													new f.parametro({tipo:t.entero, valor:"id_servicio", referencia:r.elemento}),
+												],accion:function(){
+													alert("Su cotización fue Creado con exito");
+													ventana= window.open("php/reporte_cotizacion.php?id="+cotizacion.id+"","ventana","sizable=no, scrollbars=no");
+													u.mostrar("work_oper", "link/cotizaciones.html");
+												}	
+											});
+										}
+									});
+							}		
+						});
+				
+				//$("#new_cliente").reset();
+				}
+					
+			});
+		});
+		 f.combo({
+				elemento:"condiciones",
+				sentencia:"select * from catalogos where id_padre=44",
+				valor:"id_catalogos",
+				descripcion:"descripcion"
+		});
+		f.combo({
+				elemento:"plazo_entrega",
+				sentencia:"select * from catalogos where id_padre=48",
+				valor:"id_catalogos",
+				descripcion:"descripcion"
+		});
+	});
+	
+	function mostrar_ocultar() {
+		var ocultar=document.getElementById("dServicio_preco");
+		var icono=document.getElementById("oc_img");
+	  if(ocultar.style.display=="block" || ocultar.style.display==""){
+	  		ocultar.style.display = "none";
+	  		icono.src ="img/mostrar.png";
+	  		icono.title ="Mostrar";
+	  }
+	  else{
+	  		ocultar.style.display = "block";
+	  		icono.src ="img/ocultar.png";
+	  		icono.title ="Ocultar";
+	  }
+	}
+	
+</script>
+<div class="recuadroT">
+	<label class="title">NUEVA COTIZACIÓN <a class="accCuadro" id="mos_ocl" onclick="mostrar_ocultar()"> <img src="img/ocultar.png" id="oc_img" title="Ocultar"/></a></label>
+	<div name="detalle_servicios">
+		<div name="servicios_precotizacion" class="tabla_consultas" style="display:block;" id="dServicio_preco"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+			
+				<form method="post" name="new_cotizacion" id="dCotizacion" onSubmit="return false" autocomplete="off">
+						<div name="detalle_servicio" id="dServicio" style="display: none;"> 
+							
+						</div>
+						<div name="detalle_cotizacion"></div>
+						<div name="mas_detalle_cotizacion"></div>
+						<div class="formulario">
+							<div class="filas" style="margin-top:-10px;"><div class="css_cantidad">CANTIDAD</div><div class="css_descripcion">DESCRIPCIÓN</div><div class="css_unitario">P. UNITARIO</div><div class="css_total">P. TOTAL</div></div>
+							<div class="filas">
+								 <input class="input_cantidad" name="cantidad1" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad1', 'punitario1', 'resultado1')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion1">  </textarea>
+	                             <input class="input_unitario" name="punitario1" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad1', 'punitario1', 'resultado1')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado1" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad2" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad2', 'punitario2', 'resultado2')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion2" style="overflow:hidden">  </textarea>
+	                             <input class="input_unitario" name="punitario2" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad2', 'punitario2', 'resultado2')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado2" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad3" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad3', 'punitario3', 'resultado3')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion3"></textarea>
+	                             <input class="input_unitario" name="punitario3" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad3', 'punitario3', 'resultado3')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado3" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad4" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad4', 'punitario4', 'resultado4')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion4"></textarea>
+	                             <input class="input_unitario" name="punitario4" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad4', 'punitario4', 'resultado4')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado4" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad5" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad5', 'punitario5', 'resultado5')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion5"></textarea>
+	                             <input class="input_unitario" name="punitario5" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad5', 'punitario5', 'resultado5')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado5" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad6" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad6', 'punitario6', 'resultado6')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion6"></textarea>
+	                             <input class="input_unitario" name="punitario6" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad6', 'punitario6', 'resultado6')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado6" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                      	  <div class="filas">
+								 <input class="input_cantidad" name="cantidad7" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad7', 'punitario7', 'resultado7')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion7"></textarea>
+	                             <input class="input_unitario" name="punitario7" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad7', 'punitario7', 'resultado7')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado7" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad8" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad8', 'punitario8', 'resultado8')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion8"></textarea>
+	                             <input class="input_unitario" name="punitario8" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad8', 'punitario8', 'resultado8')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado8" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad9" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad9', 'punitario9', 'resultado9')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion9"></textarea>
+	                             <input class="input_unitario" name="punitario9" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad9', 'punitario9', 'resultado9')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado9" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                          <div class="filas">
+								 <input class="input_cantidad" name="cantidad10" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad10', 'punitario10', 'resultado10')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion10"></textarea>
+	                             <input class="input_unitario" name="punitario10" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad10', 'punitario10', 'resultado10')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado10" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad11" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad11', 'punitario11', 'resultado11')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion11"></textarea>
+	                             <input class="input_unitario" name="punitario11" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad11', 'punitario11', 'resultado11')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado11" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad12" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad12', 'punitario12', 'resultado12')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion12"></textarea>
+	                             <input class="input_unitario" name="punitario12" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad12', 'punitario12', 'resultado12')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado12" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad13" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad13', 'punitario13', 'resultado13')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion13"></textarea>
+	                             <input class="input_unitario" name="punitario13" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad13', 'punitario13', 'resultado13')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado13" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <div class="filas">
+								 <input class="input_cantidad" name="cantidad14" type="text" placeholder="0" onKeyUp="fncCalcular('cantidad14', 'punitario14', 'resultado14')" onkeypress="return solonumeros(event)"/> 
+	                             <textarea class="texta_descripcion" name="descripcion14"></textarea>
+	                             <input class="input_unitario" name="punitario14" type="text" placeholder="0.0" onKeyUp="fncCalcular('cantidad14', 'punitario14', 'resultado14')" onkeypress="return solonumeros(event)"/>
+	                             <input class="input_total" name="resultado14" type="text" placeholder="0.0" readonly="readonly" />
+	                         </div>
+	                         <table cellpadding="0" cellspacing="0">
+	                         	<tr>
+	                         		<td width="160"><label id="ancho">Condiciones de Servicios</label></td>
+	                         		<td width="300"> 
+		                         		<select name="condiciones" class="select" >
+											<option selected="selected" value="0">-- Seleccione --</option>
+											
+										</select>
+								</td>
+	                         		<td width="100"><label id="anchot">Subtotal</label> </td>
+	                         		<td width="100"><input id="subtotal" name="subtotal" type="text" readonly="readonly" placeholder="0.0"/></td> 
+	                         	</tr>
+	                         	<tr>
+	                         		<td><label id="ancho">Vigencia de Cotización</label></td>
+	                         		<td><input class="input_cotizacion" name="vigencia" type="text" value="Sujeto a cambio, sin previo aviso" readonly="readonly"/></td>
+	                         		<td><label id="anchot">Iva %</label></td>
+	                         		<td><input id="iva" name="iva" class="iva" type="text"  readonly="readonly" placeholder="0.0"/></td>
+	                         		
+	                         	</tr>
+	                         	<tr>
+	                         		<td>
+	                         			<label id="ancho" for="condiciones">Plazo de Entrega</label>
+	                         		</td>
+	                         		<td>
+	                         			<select name="plazo_entrega" class="select">
+											<option value="0">-- Seleccione --</option>
+										</select>
+	                         		</td>
+	                         		<td>
+	                         			
+	                        			<label id="anchot">Total</label> 			
+	                         		</td>
+	                         		<td>
+	                        			<input id="totalCompleto" class="total" name="resultadoFinal" type="text" placeholder="0.0" readonly="readonly"  /> 			
+	                         		</td>	                         		
+	                         	</tr>
+	                         </table>
+							<div class="recuadro_boton" align="center" style="width:837px; margin-left:0px; ">
+									<input type="submit" class="boton" value="guardar" style="position:static;"/>
+							</div>
+						</div>
+					
+				</form>
+		</div>
+	</div>
+</div>

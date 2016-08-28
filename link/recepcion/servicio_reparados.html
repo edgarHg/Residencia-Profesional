@@ -1,0 +1,216 @@
+<script>
+		$(document).ready(function(){
+			u.error();
+				f.tabla({
+					elemento:"servicios_finalizados",
+					sentencia:"select * from vw_servicios_reparados",
+					columnas:[
+						new f.columna({titulo:"N° Servicio", valor:"<div class=\"hover\"><a name=\"detalles_servicio\" id=\"#id_servicio#\">#id_servicio#</a></div>",ancho:"80"}),
+						new f.columna({titulo:"Servicio", valor:"#servicio#",ancho:"80"}),
+						new f.columna({titulo:"Empresa", valor:"#razon_social#",ancho:"200"}),
+						new f.columna({titulo:"Atención", valor:"#atencion#",ancho:"140"}),
+						new f.columna({titulo:"Teléfono", valor:"#tel_atencion#",ancho:"90"}),
+						new f.columna({titulo:"Total", valor:"#total#",ancho:"90"}),
+						new f.columna({titulo:"Fecha Reparado", valor:"#fecha_reparado#",ancho:"110"})
+					],
+					ver:["5","10","15"],
+					clasificador:true,
+					paginador:true
+				});
+					u.elemento("detalle_cliente").hide();
+			u.elemento("detalles_servicio").click(function(){
+				var servicio=$(this).attr("id");
+				document.getElementById("dServicio_cancelado").style.display='none';
+				var icono=document.getElementById("oc_img");
+				icono.src ="img/mostrar.png";
+	  			icono.title ="Mostrar";
+				document.getElementById("dDetalle").style.display='block';
+				document.getElementById("dCliente").style.display='block';
+				document.getElementById("dAtencion").style.display='block';
+				document.getElementById("dServicio").style.display='block';
+				document.getElementById("dReparacion").style.display='block';
+				document.getElementById("dCotizacion").style.display='block';
+				document.getElementById("dDreparacion").style.display='block';
+			f.tabla({
+				elemento:"detalle_cliente",
+				id:"id_servicio",
+				sentencia:"SELECT * FROM  vw_servicios_reparados WHERE id_servicio=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+				],
+				columnas:[
+					new f.columna({titulo:"<div style='font-size: 10pt'>Detalle del Cliente</div>",valor:"<label>Razón social:&#160</label>&#160<input class=\"respu\" size=\"92\" value=\"#razon_social#\" disabled=\"false\"/>&#160&#160"+
+																										  "<label>R.F.C.&#160</label>&#160<input class=\"respu\" size=\"33\" value=\"#rfc_cliente#\" disabled=\"false\"/>"+
+																										  "<label>Dirección:&#160</label>&#160<input class=\"respu\" size=\"100\" value=\"#direccion_cliente#\" disabled=\"false\"/>&#160&#160"+
+																										  "<label>Telefóno:&#160</label>&#160<input class=\"respu\" size=\"23\" value=\"#telefono_cliente#\" disabled=\"false\"/>&#160&#160", ancho:"800"})
+				],accion:function(){
+					f.tabla({
+						elemento:"detalle_atencion",
+						id:"id_servicio",
+						sentencia:"SELECT * FROM  vw_servicios_reparados WHERE id_servicio=?",
+						parametros:[
+							new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+						],
+						columnas:[
+							new f.columna({titulo:"<div style='font-size: 10pt'>Detalle de la Atención</div>", valor:"<label>Nombre:&#160</label>&#160<input class=\"respu\" size=\"94\" value=\"#atencion#\" disabled=\"false\"/>&#160&#160"+
+																				  "<label>R.F.C.&#160</label>&#160<input class=\"respu\" size=\"36\" value=\"#rfc_atencion#\" disabled=\"false\"/>"+
+																				  "<label>Correo:&#160</label>&#160<input class=\"respu\" size=\"96\" value=\"#correo#\" disabled=\"false\"/>&#160&#160"+
+																				  "<label>Telefóno:&#160</label>&#160<input class=\"respu\" size=\"30\" value=\"#tel_atencion#\" disabled=\"false\"/>&#160&#160", ancho:"80"}),
+							
+						],accion:function(datos){
+							f.tabla({
+								elemento:"detalle_servicio",
+								id:"id_servicio",
+								sentencia:"SELECT * FROM  vw_servicios_reparados WHERE id_servicio=?",
+								parametros:[
+									new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+								],
+								columnas:[
+									new f.columna({titulo:"<div style='font-size: 10pt;float:left;'>Servicio N°: "+datos.filas[0].id_servicio+"<br/> Fecha Creado: "+datos.filas[0].fecha_creacion+" <br/>Creado por: "+datos.filas[0].usuario+"</div>"+
+														  "<div style='float:right;'><a target=\"_blank\" href=\"php/reporte_servicio.php?id="+datos.filas[0].id_servicio+"\"><img src=\"img/pdf.png\" title=\"PDF Servicio\"/></a>"+
+															   "<a target=\"_blank\" href=\"php/reporte_cotizacion.php?id="+datos.filas[0].id_cotizacion+"\"><img src=\"img/pdf.png\" title=\"PDF Cotizacion\"</a></div>",
+											  								  valor:"<label>Servicio:&#160</label><input class=\"respu\" size=\"24\" value=\"#servicio#\" disabled=\"false\"/>&#160&#160"+
+																					"<label>Marca:&#160</label><input class=\"respu\" size=\"23\" value=\"#marca#\" disabled=\"false\"/>&#160&#160"+
+																					"<label>Modelo:&#160</label><input class=\"respu\" size=\"23\" value=\"#modelo#\" disabled=\"false\"/>&#160&#160"+
+																					"<label>Serie:&#160</label><input class=\"respu\" size=\"25\" value=\"#serie#\" disabled=\"false\"/>&#160&#160"+
+																					"<label>Descripción de la falla:</label>"+
+																					"<textarea class=\"text_area\" disabled=\"false\">#descripcion_falla#</textarea>"+
+																					"<label>Accesorios:</label><br />"+
+																					"&#160&#160<label>Manguera:&#160</label><input class=\"respu\" size=\"21\" value=\"#manguera#\" disabled=\"false\"/>&#160&#160"+
+																					"&#160&#160<label>Pistola:&#160</label><input class=\"respu\" size=\"21\" value=\"#pistola#\" disabled=\"false\"/>&#160&#160"+
+																					"&#160&#160<label>Lanza:&#160</label><input class=\"respu\" size=\"21\" value=\"#lanza#\" disabled=\"false\"/>&#160&#160"+
+																					"&#160&#160<label>Boquilla:&#160</label><input class=\"respu\" size=\"21\" value=\"#boquilla#\" disabled=\"false\"/>", ancho:"80"}),			
+							]
+						});	
+						f.tabla({
+							elemento:"detalle_reparacion",
+							id:"id_servicio",
+							sentencia:"SELECT * FROM  vw_servicios_reparados WHERE id_servicio=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+							],
+							columnas:[
+								new f.columna({titulo:"<div style='font-size: 10pt;float:left;'>Detalle de la Revisión General del Taller<br/>"+datos.filas[0].usuario_creado_precotizacion+"<br/> Fecha Creado: "+datos.filas[0].f_creado_preco+"",
+										valor:"<label>Descripción de la Revisión:</label><br/>"+
+										      "<textarea class=\"text_area\" style=\"width:390px; height:70px;\" disabled=\"false\">#descripcion_precotizacion#</textarea>",
+										ancho:"400"}),			
+							]
+						});
+						f.consulta({
+							sentencia:"SELECT * FROM vw_cotizaciones_general WHERE id_servicio=?",
+							parametros:[
+									new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+								],
+							accion:function(cotizacion){
+								f.tabla({
+										elemento:"cotizacion",
+										id:"id_servicio",
+										sentencia:"SELECT * FROM  vw_servicios_reparados WHERE id_servicio=?",
+										parametros:[
+										new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+										],
+										columnas:[
+												new f.columna({titulo:"<div style='font-size: 10pt;float:left;'>Cotización<br/>"+cotizacion.filas[0].usuario_creado+"<br/> Fecha Creado: "+cotizacion.filas[0].fecha_creacion+"</div><div><a>mas detalles</a></div>",
+														valor:"<label>Subtotal:&#160</label><input class=\"respu\" size=\"11\" value=\"$ "+cotizacion.filas[0].subtotal+"\" disabled=\"false\"/>&#160&#160"+
+															   "<label>Iva:&#160</label><input class=\"respu\" size=\"11\" value=\"$ "+cotizacion.filas[0].iva+"\" disabled=\"false\"/>&#160&#160"+
+															   "<label>Total:&#160</label><input class=\"respu\" size=\"11\" value=\"$ "+cotizacion.filas[0].total+"\" disabled=\"false\"/>&#160&#160"+
+															   "<br/><br/><br/><br/><br/><br/>",
+														ancho:"400"})			
+										],accion:function(reparado){
+												f.tabla({
+													elemento:"descripcion_reparacion",
+													id:"id_servicio",
+													sentencia:"SELECT * FROM vw_servicios_reparados WHERE id_servicio=?",
+													parametros:[
+														new f.parametro({tipo:t.entero, valor:servicio, referencia:r.variable})
+													],
+													columnas:[
+														new f.columna({titulo:"<div style='font-size: 10pt;float:left;'>Detalles de la Reparación por el Taller<br/>"+reparado.filas[0].usuario_reparado+"<br/> Fecha Creado:"+reparado.filas[0].fecha_reparado+"",
+																		valor:"<label>Descripción de la Reparación:</label>"+
+																			  "<label style='margin-left:240px;'>Observaciones del Equipo:</label><br/>"+
+																      		  "<textarea class=\"text_area\" style=\"width:410px; height:70px;\" disabled=\"false\">"+reparado.filas[0].descripcion_reparacion+"</textarea>"+
+																      		  "<textarea class=\"text_area\" style=\"width:410px; height:70px;\" disabled=\"false\">"+reparado.filas[0].observacion_reparacion+"</textarea>",
+																		ancho:"250"})
+													]
+												});							
+										}
+								});
+								}
+						});
+					}
+				});	
+			}
+		});		
+					u.elemento("detalle_cliente").show();
+	});
+		u.elemento("cobrar_servicio").click(function(){
+			var cobrar=$(this).attr("id");
+			f.consulta({
+				sentencia:"select * from vw_servicios_reparados where id_servicio=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:cobrar, referencia:r.variable})
+				],
+				accion:function(date){
+					if(confirm("Realmente deseas cobrar el servicio N° " +
+								date.filas[0].id_servicio + "\n" +	 
+								"Servicio de: " + date.filas[0].servicio + "\n" +
+								"Marca: " + date.filas[0].marca + "\n" +
+								"Modelo: " + date.filas[0].modelo + "\n" +
+								"Subtotal: " + date.filas[0].subtotal + "\n" +
+								"Iva: " + date.filas[0].iva + "\n" +
+								"Total: " + date.filas[0].total + "\n" )){
+									var estatus_pago=54;
+									f.consulta({
+										sentencia:"UPDATE servicios SET id_estatus_pago=? WHERE id_servicio=?",
+										parametros:[
+											new f.parametro({tipo:t.entero, valor:estatus_pago, referencia:r.variable}),
+											new f.parametro({tipo:t.entero, valor:cobrar, referencia:r.variable})
+										],accion:function(){
+												alert("El servicio N°" + date.filas[0].id_servicio + " se cobro con exito");	
+										}
+									});
+									u.mostrar("work_oper","link/servicio_finalizados.html");
+					}							
+				}
+			});
+		});
+	});
+	function mostrar_ocultar() {
+		var ocultar=document.getElementById("dServicio_cancelado");
+		var icono=document.getElementById("oc_img");
+		
+					
+	  if(ocultar.style.display=="block" || ocultar.style.display==""){
+	  		ocultar.style.display = "none";
+	  		icono.src ="img/mostrar.png";
+	  		icono.title ="Mostrar";
+	  			
+	  }
+	  else{
+	  		ocultar.style.display = "block";
+	  		icono.src ="img/ocultar.png";
+	  		icono.title ="Ocultar";
+	  		document.getElementById("dCliente").style.display='none';
+			document.getElementById("dAtencion").style.display='none';
+			document.getElementById("dServicio").style.display='none';
+			document.getElementById("dReparacion").style.display='none';
+			document.getElementById("dCotizacion").style.display='none';
+			document.getElementById("dDreparacion").style.display='none';
+	  }
+	}
+</script>
+<div class="recuadroT">
+	<label class="title">SERVICIO REPARADOS <a class="accCuadro" id="mos_ocl" onclick="mostrar_ocultar()"> <img src="img/ocultar.png" id="oc_img" title="Ocultar"/></a></label>
+	<div name="detalle_servicios">
+		<div name="servicios_finalizados" class="tabla_consultas" id="dServicio_cancelado" style="display: block;"> </div>
+		<div class="detalles" id="dDetalle" style="display: none;">
+					<div name="detalle_servicio" id="dServicio" style="display: none;"> </div>
+					<div name="detalle_cliente" id="dCliente" style="display: none;"> 	</div>
+					<div name="detalle_atencion" id="dAtencion" style="display: none;"> </div>
+					<div name="detalle_reparacion" id="dReparacion" style="display: none;float:left; margin-top:-10px; margin-right: 10px;" > </div>
+					<div name="cotizacion" id="dCotizacion" style="display: none; height: 100px;"> </div>
+					
+					<div name="descripcion_reparacion" id="dDreparacion" style="display: none;margin-top:80px;"> </div>				
+		</div>
+	</div>
+</div>

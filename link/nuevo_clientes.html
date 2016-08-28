@@ -1,0 +1,78 @@
+ <script>
+        	jQuery.fn.reset = function () {
+ 			 $(this).each (function() { this.reset(); });
+				}
+			$(document).ready(function(){
+				u.error();
+		        f.combo({
+				elemento:"estados",
+				sentencia:"select * from estados",
+				valor:"id_estado",
+				descripcion:"nombre_estado",
+				cambio:function(){
+					cMunicipios.ejecutar();
+				}
+			});
+			cMunicipios = new f.combo({
+				elemento:"municipios",
+				sentencia:"select * from municipios where id_estado=?",
+				parametros:[
+					new f.parametro({tipo:t.entero, valor:"estados", referencia:r.elemento})
+				  ],
+				valor:"id_municipio",
+				descripcion:"nombre_municipio",
+				
+			});
+			u.mascara("telefono","999-99-99", "-")
+			
+			u.elemento("new_cliente").submit(function(){
+				f.validar({
+					elementos:[
+						new f.elemento({nombre:"razon_social", tipo:"alfanumerico", requerido:true}),
+						// new f.elemento({nombre:"calle", tipo:"texto", requerido:true}),
+						// new f.elemento({nombre:"colonia", tipo:"texto", requerido:true}),
+						new f.elemento({nombre:"estados", tipo:"combo", requerido:true}),
+						new f.elemento({nombre:"municipios", tipo:"combo", requerido:true})	
+					],accion:function(){	
+			f.consulta({
+					sentencia:"insert into clientes(razon_social,telefono,calle,numero,colonia,id_municipio,id_estado) values(?,?,?,?,?,?,?)",
+					parametros:[
+						new f.parametro({tipo:t.cadena, valor:"razon_social", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"telefono", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"calle", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"numero", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"colonia", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"municipios", referencia:r.elemento}),
+						new f.parametro({tipo:t.cadena, valor:"estados", referencia:r.elemento})						
+						]
+						
+				});
+				
+				$("#new_cliente").reset();
+				}
+					
+			});
+		});	
+		});
+	</script>
+<div class="recuadro">
+	<label class="title">NUEVO CLIENTE</label>
+	<form method="post" id="new_cliente" onSubmit="return false" autocomplete="off">
+		<div class="formulario">
+		<table cellpadding="0" cellspacing="0" style="margin: 0 auto; padding-bottom: 5px;">
+			<tbody>
+				<tr><td>Razón social:</td>  <td><input type="text" name="razon_social" class="in_cliente"/></td></tr>
+				<tr><td>Teléfono:</td>	    <td><input type="text" name="telefono" class="in_cliente"/></td></tr>
+				<tr><td>Calle:</td>		    <td><input type="text" name="calle" class="in_cliente"/></td></tr>
+				<tr><td>Numero:</td>	    <td><input type="text" name="numero" class="in_cliente"/></td></tr>
+				<tr><td>Colonia:</td>		<td><input type="text" name="colonia" class="in_cliente"/></td></tr>
+				<tr><td>Estado:</td>		<td><select name="estados" class="slect"><option value="0">-- Seleccione --</option></select></td></tr>
+				<tr><td>Municipio:</td>		<td><select name="municipios" class="slect"><option value="0">-- Seleccione --</option></select></td></tr>
+			</tbody>
+		</table>
+			<div class="recuadro_boton" align="center">
+				<input type="submit" class="boton" value="guardar" /><div class="mensajes"> </div>
+			</div>
+		</div>
+	</form>
+</div>

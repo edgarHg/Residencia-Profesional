@@ -1,0 +1,77 @@
+<script>
+	$(document).ready(function(){
+		u.elemento("cambio").submit(function(){
+			f.validar({
+				elementos:[
+					new f.elemento({nombre:"password", tipo:"texto", requerido:true}),
+					new f.elemento({nombre:"nuevo_password", tipo:"texto", requerido:true}),
+					new f.elemento({nombre:"confirmar_password", tipo:"texto", requerido:true})
+				],
+				accion:function(){
+					if(u.elemento("nuevo_password").val()==u.elemento("confirmar_password").val()){
+						f.consulta({
+							sentencia:"SELECT * FROM usuarios WHERE id_usuario=? AND contrasena=?",
+							parametros:[
+								new f.parametro({tipo:t.entero, valor:"id", referencia:r.sesion}),
+								new f.parametro({tipo:t.cadena, valor:"password", referencia:r.elemento})
+							],
+							accion:function(datos){
+								if(datos.resultados!=0){
+									f.consulta({
+										sentencia:"UPDATE usuarios SET contrasena=?, estatus_contrasena=1 WHERE id_usuario=? AND contrasena=?",
+										parametros:[
+											new f.parametro({tipo:t.cadena, valor:"nuevo_password", referencia:r.elemento}),
+											new f.parametro({tipo:t.entero, valor:"id", referencia:r.sesion}),
+											new f.parametro({tipo:t.cadena, valor:"password", referencia:r.elemento})
+										],
+										accion:function(datos){
+											document.location='index.html';
+										}
+									});
+								}
+							}
+						});
+					}
+					else u.elemento("mensajes").html("<label class=\"error\">La confirmacion de la contraseña no es igual</label>");
+				}
+			});
+		});
+	});
+</script>
+<style type="text/css">
+
+</style>
+<div class="recuadro">
+	<label class="title">CAMBIAR CONTRASEÑA</label>
+	<form name="cambio" autocomplete="off" onSubmit="return false">
+		<div class="formulario" align="center">
+			<br />
+			<div  class="filas">
+				Contraseña Actual:&#160&#160&#160&#160<input name="password" class="in_cliente" type="password"/>
+			</div>
+			<div  class="filas">
+				Nueva Contraseña: &#160&#160&#160&#160<input name="nuevo_password" class="in_cliente" type="password" />
+			</div>
+			<div  class="filas">
+				Confirmar Contraseña:	<input name="confirmar_password" class="in_cliente" type="password"/>
+			</div>
+		<br /><br />
+			<div class="recuadro_boton" align="center">
+				<input name="btnCambiar" class="boton" type="submit" value="Cambiar" /><div class="mensajes"></div>
+			</div>
+			
+		</div>
+		
+	</form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
